@@ -1,0 +1,33 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dj.trip.domain.like.mapper.LikeMapper">
+
+    <insert id="insertLike" parameterType="Like">
+        insert into member_board_like (review_id, member_id)
+        values (#{reviewId}, #{memberId})
+    </insert>
+
+    <select id="isHasLike" parameterType="Like" resultType="boolean">
+        select case
+                   when exists (select 1
+                                from member_board_like
+                                where review_id = #{reviewId}
+                                  and member_id = #{memberId}) then true
+                   else false
+                   end
+    </select>
+
+    <select id="isWriteByMe" parameterType="Like" resultType="boolean">
+        select if(member_id = #{memberId}, true, false)
+        from review
+        where review_id = #{reviewId}
+    </select>
+
+    <delete id="deleteLike" parameterType="Like">
+        delete
+        from member_board_like
+        where review_id = #{reviewId}
+          and member_id = #{memberId}
+    </delete>
+</mapper>

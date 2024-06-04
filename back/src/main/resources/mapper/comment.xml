@@ -1,0 +1,44 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dj.trip.domain.comment.mapper.CommentMapper">
+
+    <insert id="insertComment" parameterType="Comment">
+        insert into comment (member_id, review_id, content)
+        values (#{memberId}, #{reviewId}, #{content})
+    </insert>
+
+    <select id="selectComments" parameterType="CommentsDao" resultType="CommentInfo">
+        select c.comment_id,
+               m.nickname,
+               m.image_url,
+               c.content,
+               c.create_date,
+               if(c.member_id = #{memberId}, true, false) as isWriteByMe
+        from comment c
+                 join member m
+                      on c.member_id = m.member_id
+        where review_id = #{reviewId} limit #{start}
+            , #{pageSize}
+    </select>
+
+    <select id="getTotalCommentsCount" parameterType="CommentsDao" resultType="int">
+        select count(comment_id)
+        from comment
+        where review_id = #{reviewId}
+    </select>
+
+    <update id="modifyComment" parameterType="Comment">
+        update comment
+        set content = #{content}
+        where comment_id = #{commentId}
+          and member_id = #{memberId}
+    </update>
+
+    <delete id="deleteComment" parameterType="Comment">
+        delete
+        from comment
+        where comment_id = #{commentId}
+          and member_id = #{memberId}
+    </delete>
+</mapper>

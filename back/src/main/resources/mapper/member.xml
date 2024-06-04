@@ -1,0 +1,105 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dj.trip.domain.member.mapper.MemberMapper">
+
+    <insert id="insertMember" parameterType="Member">
+        insert into member(member_id, password, nickname, email, role, oauth_server_type)
+        values (#{memberId}, #{password}, #{nickname}, #{email}, #{role}, #{oauthServiceType})
+    </insert>
+
+    <select id="selectMemberByMemberId" parameterType="String" resultType="Member">
+        select member_id, password, nickname, email, role
+        from member
+        where member_Id = #{memberId}
+    </select>
+
+    <select id="selectMemberByNickname" parameterType="String" resultType="Member">
+        select member_id, password, nickname, email, role
+        from member
+        where nickname = #{nickname}
+    </select>
+
+    <select id="selectMemberByEmail" parameterType="String" resultType="Member">
+        select member_id, password, nickname, email, role
+        from member
+        where email = #{email}
+    </select>
+
+    <select id="selectMemberByOauthServerTypeAndEmail" parameterType="Member">
+        select member_id, oauth_server_type, email
+        from member
+        where email = #{email}
+          and oauth_server_type = #{oauthServerType}
+    </select>
+
+    <select id="selectMemberByMemberIdAndEmail" resultType="Member">
+        select member_id, password, nickname, email, role
+        from member
+        where member_Id = #{memberId}
+          and email = #{email}
+    </select>
+
+    <update id="updateMember">
+        update member
+        set password  = #{password},
+            nickname  = #{nickname},
+            image_url = #{imageUrl}
+        where member_id = #{memberId}
+    </update>
+
+    <select id="selectMemberInfoByMemberId" parameterType="String" resultType="MemberInfo">
+        select m.member_id,
+               m.nickname,
+               m.email,
+               m.image_url,
+               count(r.review_id)      as reviews,
+               ifnull(sum(s.score), 0) as score
+        from member m
+                 left join review r
+                           on m.member_id = r.member_id
+                 left join score s on m.member_id = s.member_id
+        group by m.member_id
+        having m.member_Id = #{memberId}
+    </select>
+
+    <select id="selectMemberPswInfoByMemberId" parameterType="String" resultType="MemberInfo">
+        select member_id,
+               nickname,
+               email,
+               image_url,
+               password
+        from member
+        where member_Id = #{memberId}
+    </select>
+
+    <select id="getImageUrl" parameterType="String" resultType="String">
+        select image_url
+        from member
+        where member_Id = #{memberId}
+    </select>
+
+    <update id="modifyMember" parameterType="member">
+        update member
+        set
+        <if test="password != null and password != ''">
+            password = #{password},
+        </if>
+        nickname = #{nickname},
+        image_url = #{imageUrl},
+        email = #{email}
+        where member_id = #{memberId}
+    </update>
+
+    <select id="getPassword" parameterType="String" resultType="String">
+        select password
+        from member
+        where member_Id = #{memberId}
+    </select>
+
+    <delete id="deleteMember" parameterType="String">
+        delete
+        from member
+        where member_id = #{memberId};
+    </delete>
+</mapper>

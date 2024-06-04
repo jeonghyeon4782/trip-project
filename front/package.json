@@ -1,0 +1,25 @@
+{
+  "name": "front",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3000",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "imagesloaded": "^5.0.0",
+    "moment-timezone": "^0.5.45",
+    "sweetalert2": "^11.11.0",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0",
+    "vue3-carousel": "^0.3.3",
+    "vue3-kakao-maps": "^2.3.9"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.2.8"
+  }
+}

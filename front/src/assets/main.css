@@ -1,0 +1,49 @@
+
+
+html, body {
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: #28161C;
+  transition: 0.4s;
+  padding: 3px;
+}
+
+.carousel__track {
+  /* transform: translateX(0px);
+  transition: all 0ms ease 0s;
+  width: 100%; */
+  display: flex;
+}
+
+.carousel__track li {
+  /* width: 100%; */
+}
+.carousel__track li {
+  /* width: 100%; */
+}
+
+.carousel__track {
+  /* transform: translateX(0px);
+  transition: all 0ms ease 0s;
+  width: 100%; */
+  display: flex;
+}
+
+.carousel__track li {
+  /* width: 100%; */
+}
+
+.swal-title {
+  font-size: 23px; /* 제목 텍스트 크기 */
+}
+
+.swal-text {
+  font-size: 18px; /* 본문 텍스트 크기 */
+}

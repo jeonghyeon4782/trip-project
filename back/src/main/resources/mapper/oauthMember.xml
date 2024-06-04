@@ -1,0 +1,23 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dj.trip.domain.oauth.mapper.OauthMemberMapper">
+
+    <select id="selectOauthMemberByOauthId" parameterType="int">
+        select oauth_id, oauth_server_type, email
+        from oauth_member
+        where oauth_id = #{oauthId}
+    </select>
+
+    <select id="selectOauthMemberByOauthServerTypeAndEmail" parameterType="OauthMember">
+        select oauth_id, oauth_server_type, email
+        from oauth_member
+        where email = #{email} and oauth_server_type = #{oauthServerType}
+    </select>
+
+    <insert id="insertOauthMember" parameterType="OauthMember">
+        insert into oauth_member(oauth_server_type, email)
+        values (#{oauthServerType}, #{email})
+    </insert>
+
+</mapper>

@@ -1,0 +1,141 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dj.trip.domain.review.mapper.ReviewMapper">
+
+    <insert id="insertReview" parameterType="Review">
+        insert into review(attraction_info_id, member_id, title, content, image_url)
+        values (#{attractionInfoId}, #{memberId}, #{title}, #{content}, #{imageUrl})
+    </insert>
+
+    <select id="selectReviewId" parameterType="Review" resultType="int">
+        select review_id
+        from review
+        where attraction_info_id = #{attractionInfoId}
+          and member_id = #{memberId}
+          and title = #{title}
+          and content = #{content}
+        order by review_id desc limit 1
+    </select>
+
+    <select id="selectReview" parameterType="GetReviewDao" resultType="GetReviewDao">
+        select r.review_id,
+               r.attraction_info_id,
+               a.name                                                                            as attractionName,
+               m.nickname,
+               r.title,
+               r.content,
+               r.image_url                                                                       as reviewImageUrl,
+               m.image_url                                                                       as profileImageUrl,
+               r.hits,
+               r.create_date,
+               count(l.member_board_like_id)                                                     as likes,
+               if(r.member_id = #{memberId}, true, false)                                        as isWriteByMe,
+               if(r.review_id in (select review_id
+                                  from member_board_like
+                                  where member_board_like.member_id = #{memberId}), true, false) as isCheckLike
+        from review r
+                 join member m
+                      on r.member_id = m.member_id
+                 join attraction_info a
+                      on r.attraction_info_id = a.attraction_info_id
+                 left join member_board_like l
+                           on r.review_id = l.review_id
+        group by r.review_id
+        having r.review_id = #{reviewId}
+    </select>
+
+    <sql id="searchByKeyword">
+        <if test="keyword != null and keyword != ''">
+            (
+            title like concat('%', #{keyword}, '%')
+            or content like concat('%', #{keyword}, '%')
+            )
+        </if>
+    </sql>
+
+    <sql id="searchBySidoId">
+        <if test="sidos != null and sidos.size() > 0">
+            and s.sido_id in
+            <foreach item="sido_id" collection="sidos" open="(" separator="," close=")">
+                #{sido_id}
+            </foreach>
+        </if>
+    </sql>
+
+    <sql id="searchOrder">
+        <if test="order == 'like'">
+            order by likes desc
+        </if>
+        <if test="order != 'like'">
+            order by r.review_id desc
+        </if>
+    </sql>
+
+    <select id="selectReviews" parameterType="ReviewsDao" resultType="ReviewInfo">
+        select r.review_id, m.nickname, r.title, r.image_url as reviewImageUrl,
+        m.image_url as profileImageUrl, r.hits,
+        count(l.member_board_like_id)as likes
+        from review r
+        join member m
+        on r.member_id=m.member_id
+        left join member_board_like l
+        on r.review_id=l.review_id
+        join attraction_info a
+        on r.attraction_info_id = a.attraction_info_id
+        join sido s
+        on a.sido_id = s.sido_id
+        <where>
+            <include refid="searchByKeyword"></include>
+            <include refid="searchBySidoId"></include>
+        </where>
+        group by r.review_id
+        <include refid="searchOrder"></include>
+        limit #{start}, #{pageSize}
+    </select>
+
+    <select id="getTotalReviewsCount" parameterType="ReviewsDao" resultType="int">
+        select count(review_id)
+        from review r
+        join attraction_info a
+        on r.attraction_info_id = a.attraction_info_id
+        join sido s
+        on a.sido_id = s.sido_id
+        <where>
+            <include refid="searchByKeyword"></include>
+            <include refid="searchBySidoId"></include>
+        </where>
+    </select>
+
+    <select id="getImageUrl" parameterType="Review" resultType="String">
+        select image_url
+        from review
+        where review_id = #{reviewId}
+          and member_id = #{memberId}
+    </select>
+
+    <update id="modifyReview" parameterType="Review">
+        update review
+        set attraction_info_id = #{attractionInfoId},
+        member_id = #{memberId},
+        title = #{title},
+        content = #{content}
+        <if test="imageUrl != null and imageUrl != ''">
+            ,image_url = #{imageUrl}
+        </if>
+        where review_id = #{reviewId}
+    </update>
+
+    <delete id="deleteReview" parameterType="Review">
+        delete
+        from review
+        where review_id = #{reviewId}
+          and member_id = #{memberId}
+    </delete>
+
+    <update id="updateHit" parameterType="int">
+        update review
+        set hits = hits + 1
+        where review_id = #{reviewId}
+    </update>
+</mapper>

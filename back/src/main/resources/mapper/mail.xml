@@ -1,0 +1,16 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dj.trip.domain.mail.mapper.MailMapper">
+    <insert id="insertMail">
+        insert into mail(email, `key`)
+        values (#{email}, #{key})
+    </insert>
+    <select id="selectMailByEmail" resultType="MailVo">
+        SELECT * FROM mail WHERE email = #{email}
+    </select>
+    <delete id="deleteMailByEmail">
+        delete from mail
+        where email = #{email}
+    </delete>
+</mapper>

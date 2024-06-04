@@ -1,0 +1,82 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dj.trip.domain.board.mapper.BoardMapper">
+
+    <select id="selectMemberBoardMapBySidoIdAndMemberId" resultType="MemberBoardMapVo">
+        SELECT member_board_map_id, member_id, sido_id, now_location, island_cnt
+        FROM member_board_map
+        WHERE sido_id = #{sidoId}
+          AND member_id = #{memberId}
+    </select>
+
+    <select id="selectMemberBoardMapByMemberBoardMapId" resultType="MemberBoardMapVo">
+        SELECT member_board_map_id, member_id, sido_id, now_location, island_cnt
+        FROM member_board_map
+        WHERE member_board_map_id = #{memberBoardMapId}
+    </select>
+
+    <insert id="insertMemberBoardMap" useGeneratedKeys="true" keyProperty="memberBoardMapId">
+        insert into member_board_map(member_id, sido_id)
+        values (#{memberId}, #{sidoId})
+    </insert>
+
+    <insert id="insertBoard">
+            insert into board(member_board_map_id, attraction_info_id, location)
+            values (#{memberBoardMapId}, #{attractionInfoId}, #{location})
+    </insert>
+
+    <select id="selectBoardInfo" resultType="BoardInfoVo">
+        select ai.name as attractionName, ai.url as attractionUrl, b.location
+        from board b
+                 join attraction_info ai on ai.attraction_info_id = b.attraction_info_id
+        where b.member_board_map_id = #{memberBoardMapId};
+    </select>
+
+    <update id="updateMemberBoardMap">
+        update member_board_map
+        set now_location = (now_location + #{diceVal1} + #{diceVal2}) % 28,
+            island_cnt = #{islandCnt}
+        where member_board_map_id = #{memberBoardMapId}
+    </update>
+
+
+    <select id="selectNowLocationByMemberBoardMapId" resultType="int">
+        select now_location
+        from member_board_map
+        where member_board_map_id = #{memberBoardMapId}
+    </select>
+
+    <delete id="deleteBoardByMemberBoardMapId">
+        delete
+        from board
+        where member_board_map_id = #{memberBoardMapId}
+    </delete>
+
+    <delete id="deleteMemberBoardMapByMemberBoardMapId">
+        delete
+        from member_board_map
+        where member_board_map_id = #{memberBoardMapId}
+    </delete>
+
+    <update id="updateNowLocation">
+        update member_board_map
+        set now_location = #{location}
+        where member_board_map_id = #{memberBoardMapId}
+    </update>
+
+    <insert id="insertMemberBoardLog">
+        INSERT INTO member_board_log (member_id, attraction_info_id)
+        SELECT #{memberId}, attraction_info_id
+        FROM board
+        WHERE member_board_map_id = #{memberBoardMapId}
+          AND location NOT IN (0, 3, 7, 9, 12, 18, 21, 25)
+          AND location = #{location}
+          AND NOT EXISTS(
+                SELECT 1
+                FROM member_board_log
+                WHERE member_id = #{memberId}
+                  AND attraction_info_id = board.attraction_info_id
+            );
+    </insert>
+</mapper>
